@@ -13,6 +13,8 @@
     "popup": "popup.html"
   },
   "permissions": [
-    "tabs", "http://grooveshark.com/*"
+    "notifications",
+    "tabs",
+    "http://grooveshark.com/*"
   ]
 }

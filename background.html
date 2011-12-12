@@ -1,17 +1,61 @@
-<script>
-var grooveshark_tab = 0;
+<html>
+<head>
+  <script>
+  var grooveshark_tab = -1;
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if ((tab != null) && (tab.url == "http://grooveshark.com/")) {
-    grooveshark_tab = tabId;
-  }
-});
-
-chrome.extension.onRequest.addListener(
-  function(request, sender, sendResponse) {
-    if (request.action == "forward") {
-      if (grooveshark_tab != 0)
-        chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('player_next').click()"});
+  function getSongData(content) {
+    //Returns an array with title, author & album
+    result = new Array(3);
+    //Remove initial and final < >
+    splits = content.split("</a>");
+    for (index in splits) {
+      if (splits[index] != "") {
+        str = splits[index];
+        result[index] = str.substr(str.search(">") + 1, content.length);
+      }
     }
-});
-</script>
+    return result;
+  }
+
+  function testGetSongData() {
+    result = getSongData("<a href=# title=\"title\">title</a>" +
+                         " by " +
+                         "<a href=# title=\"artist\">artist</a>" +
+                         " on " +
+                         "<a href=\"album\">album</a>");
+    if ((result[0] != "title") ||
+        (result[1] != "artist") ||
+        (result[2] != "album")) { alert("Something was wrong testing the function"); }
+  }
+  testGetSongData();
+
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if ((tab != null) && (tab.url.search("grooveshark.com") >= 0)) {
+      grooveshark_tab = tabId;
+      chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+        grooveshark_tab = -1;
+      });
+    }
+  });
+
+  chrome.extension.onRequest.addListener(
+    function(request, sender, sendResponse) {
+      if (request.action == "forward") {
+        if (grooveshark_tab != -1) {
+          chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('player_next').click()"});
+          chrome.tabs.executeScript(grooveshark_tab, {code: "var innerHTML = document.getElementById('playerDetails_current_song').innerHTML"}, function () {
+              debugger;
+              console.log(innerHTML);
+          });
+          sendResponse({title: 'title',
+                        artist: 'artist',
+                        album: 'album'});
+        } else
+          sendResponse({message: "No Grooveshark tab found!"})
+      }
+  });
+  </script>
+</head>
+<body>
+</body>
+</html>
