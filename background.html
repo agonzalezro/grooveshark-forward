@@ -1,0 +1,17 @@
+<script>
+var grooveshark_tab = 0;
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if ((tab != null) && (tab.url == "http://grooveshark.com/")) {
+    grooveshark_tab = tabId;
+  }
+});
+
+chrome.extension.onRequest.addListener(
+  function(request, sender, sendResponse) {
+    if (request.action == "forward") {
+      if (grooveshark_tab != 0)
+        chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('player_next').click()"});
+    }
+});
+</script>
