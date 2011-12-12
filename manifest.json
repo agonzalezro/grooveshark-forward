@@ -4,11 +4,12 @@
   "description": "Forward the playing song on Grooveshark tab.",
   "background_page": "background.html",
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
   },
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "icons/16.png",
     "popup": "popup.html"
   },
   "permissions": [
