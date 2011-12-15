@@ -1,42 +1,4 @@
-<html>
-<head>
-  <script>
-    function show_desktop_notification(title, artist, album) {
-      var wkn = webkitNotifications.createNotification(
-        "icons/48.png",
-        title,
-        artist //eyecandy: Don't shot the album info + " (" + album + ")"
-      );
-      wkn.ondisplay = function() {
-        setTimeout(function() { wkn.cancel(); }, 5000);
-      };
-      wkn.show();
-    }
-
-    chrome.extension.sendRequest({action: "forward"}, function(response){
-      debugger;
-      if (('title' in response) && (response.title != "")) {
-        show_desktop_notification(response.title,
-                                  response.artist,
-                                  response.album);
-        //close();
-      } else if ('message' in response)
-        document.getElementById('message').innerHTML = response.message;
-      else
-        close();
-      });
-  </script>
-  <style>
-    body {
-      width: 150px;
-      font-family: sans-serif;
-      size: 10px;
-      text-align: center;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <div id="message"></div>
-</body>
-</html>
+<script>
+chrome.extension.sendRequest({action: "forward"});
+close();
+</script>

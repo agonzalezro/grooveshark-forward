@@ -1,61 +1,69 @@
-<html>
-<head>
-  <script>
-  var grooveshark_tab = -1;
+<script>
+var grooveshark_tab = -1;
 
-  function getSongData(content) {
-    //Returns an array with title, author & album
-    result = new Array(3);
-    //Remove initial and final < >
-    splits = content.split("</a>");
-    for (index in splits) {
-      if (splits[index] != "") {
-        str = splits[index];
-        result[index] = str.substr(str.search(">") + 1, content.length);
-      }
+
+/* This getSongData stuff is legacy code that I was using for test to show
+the song information on each forward click. But finally I didn't see
+useful show so many times this information. */
+function getSongData(content) {
+  //Returns an array with title, author & album
+  result = new Array(3);
+  //Remove initial and final < >
+  splits = content.split("</a>");
+  for (index in splits) {
+    if (splits[index] != "") {
+      str = splits[index];
+      result[index] = str.substr(str.search(">") + 1, content.length);
     }
-    return result;
   }
+  return result;
+}
 
-  function testGetSongData() {
-    result = getSongData("<a href=# title=\"title\">title</a>" +
-                         " by " +
-                         "<a href=# title=\"artist\">artist</a>" +
-                         " on " +
-                         "<a href=\"album\">album</a>");
-    if ((result[0] != "title") ||
-        (result[1] != "artist") ||
-        (result[2] != "album")) { alert("Something was wrong testing the function"); }
+
+function testGetSongData() {
+  result = getSongData("<a href=# title=\"title\">title</a>" +
+                       " by " +
+                       "<a href=# title=\"artist\">artist</a>" +
+                       " on " +
+                       "<a href=\"album\">album</a>");
+  if ((result[0] != "title") ||
+      (result[1] != "artist") ||
+      (result[2] != "album")) { alert("Something was wrong testing the function"); }
+}
+testGetSongData();
+
+
+function show_desktop_notification(title, content) {
+  var wkn = webkitNotifications.createNotification(
+    "icons/48.png",
+    title,
+    content
+  );
+  wkn.ondisplay = function() {
+    setTimeout(function() { wkn.cancel(); }, 5000);
+  };
+  wkn.show();
+}
+
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if ((tab != null) && (tab.url.search("grooveshark.com") >= 0)) {
+    grooveshark_tab = tabId;
+    chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+      grooveshark_tab = -1;
+    });
   }
-  testGetSongData();
+});
 
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if ((tab != null) && (tab.url.search("grooveshark.com") >= 0)) {
-      grooveshark_tab = tabId;
-      chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-        grooveshark_tab = -1;
-      });
+
+chrome.extension.onRequest.addListener(
+  function(request, sender, sendResponse) {
+    if (request.action == "forward") {
+      if (grooveshark_tab != -1) {
+        chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('player_next').click()"});
+      } else
+        show_desktop_notification('No Grooveshark tab found!',
+                                  'If you have it open, reload it.');
     }
-  });
-
-  chrome.extension.onRequest.addListener(
-    function(request, sender, sendResponse) {
-      if (request.action == "forward") {
-        if (grooveshark_tab != -1) {
-          chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('player_next').click()"});
-          chrome.tabs.executeScript(grooveshark_tab, {code: "var innerHTML = document.getElementById('playerDetails_current_song').innerHTML"}, function () {
-              debugger;
-              console.log(innerHTML);
-          });
-          sendResponse({title: 'title',
-                        artist: 'artist',
-                        album: 'album'});
-        } else
-          sendResponse({message: "No Grooveshark tab found!"})
-      }
-  });
-  </script>
-</head>
-<body>
-</body>
-</html>
+});
+</script>
