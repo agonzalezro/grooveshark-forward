@@ -1,7 +1,9 @@
 PYTHON_CODE = "import json;\
 		 	   f = open('manifest.json', 'r');\
 			   manifest = json.loads(f.read());\
-     		   manifest['version'] = str(int(manifest['version']) + 1);\
+			   version = manifest['version'];\
+			   version = str(float(version) + .01);\
+     		   manifest['version'] = str(version);\
  			   f = open('manifest.json', 'w');\
 			   f.write(json.dumps(manifest, indent=4));\
 			   f.close()"
