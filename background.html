@@ -50,7 +50,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if ((tab != null) && (tab.url.search("grooveshark.com") >= 0)) {
     grooveshark_tab = tabId;
     chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-      grooveshark_tab = -1;
+      if (tabId == grooveshark_tab)
+        grooveshark_tab = -1;
     });
   }
 });
