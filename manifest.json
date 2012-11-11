@@ -5,16 +5,16 @@
         "48": "icons/48.png", 
         "16": "icons/16.png"
     }, 
-    "version": "4.5", 
+    "name": "Grooveshark forward", 
+    "version": "4.6", 
     "background_page": "background.html", 
-    "permissions": [
-        "notifications", 
-        "tabs", 
-        "http://grooveshark.com/*"
-    ], 
     "browser_action": {
         "popup": "popup.html", 
         "default_icon": "icons/16.png"
     }, 
-    "name": "Grooveshark forward"
+    "permissions": [
+        "notifications", 
+        "tabs", 
+        "http://grooveshark.com/*"
+    ]
 }
