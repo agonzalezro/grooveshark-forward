@@ -61,7 +61,7 @@ chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
     if (request.action == "forward") {
       if (grooveshark_tab != -1) {
-        chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('player_next').click()"});
+        chrome.tabs.executeScript(grooveshark_tab, {code: "document.getElementById('play-next').click()"});
       } else
         show_desktop_notification('No Grooveshark tab found!',
                                   'If you have it open, reload it.');
